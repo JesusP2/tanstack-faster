@@ -1,0 +1,22 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "test-template",
+	"main": "@tanstack/react-start/server-entry",
+	"compatibility_date": "2025-07-05",
+	"compatibility_flags": ["nodejs_compat"],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "CACHE",
+				"class_name": "DurableObjectRateLimiter"
+			}
+		]
+	},
+	"migrations": [{ "tag": "v1", "new_classes": ["DurableObjectRateLimiter"] }],
+	"observability": {
+		"enabled": true,
+		"logs": {
+			"enabled": true
+		}
+	}
+}
