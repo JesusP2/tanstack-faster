@@ -1,11 +1,14 @@
-import type { ClientRateLimitInfo, Options, RateLimitConfiguration, Store } from "./types";
-import { env } from 'cloudflare:workers'
+import type { env } from 'cloudflare:workers';
+import type {
+  ClientRateLimitInfo,
+  Options,
+  RateLimitConfiguration,
+  Store,
+} from './types';
 
 type Env = typeof env;
-export class WorkersKVStore<
-  E extends Env = Env,
-  P extends string = string,
-> implements Store<E, P>
+export class WorkersKVStore<E extends Env = Env, P extends string = string>
+  implements Store<E, P>
 {
   /**
    * Expiration targets that are less than 60 seconds into the future are not supported. This is true for both expiration methods.
@@ -37,7 +40,7 @@ export class WorkersKVStore<
    */
   constructor(options: Options<KVNamespace>) {
     this.namespace = options.namespace;
-    this.prefix = options.prefix ?? "hrl:";
+    this.prefix = options.prefix ?? 'hrl:';
   }
 
   /**
@@ -70,12 +73,12 @@ export class WorkersKVStore<
   async get(key: string): Promise<ClientRateLimitInfo | undefined> {
     const result = await this.namespace.get<ClientRateLimitInfo>(
       this.prefixKey(key),
-      "json",
+      'json'
     );
 
     if (result) return result;
 
-    return undefined;
+    return;
   }
 
   /**
@@ -174,7 +177,7 @@ export class WorkersKVStore<
    */
   private async updateRecord(
     key: string,
-    payload: ClientRateLimitInfo,
+    payload: ClientRateLimitInfo
   ): Promise<void> {
     await this.namespace.put(this.prefixKey(key), JSON.stringify(payload), {
       expiration: this.calculateExpiration(payload.resetTime as Date),

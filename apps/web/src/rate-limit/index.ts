@@ -1,21 +1,21 @@
+import { env } from 'cloudflare:workers';
 import {
   getRequestHeader,
   getResponseStatus,
   setResponseStatus,
-} from "@tanstack/react-start/server";
+} from '@tanstack/react-start/server';
 import {
   setDraft6Headers,
   setDraft7Headers,
   setRetryAfterHeader,
-} from "./headers";
+} from './headers';
+import { WorkersKVStore } from './kv-store';
 import type {
-  RateLimitConfiguration,
   GeneralConfigType,
+  RateLimitConfiguration,
   RateLimitInfo,
-} from "./types";
-import { getKeyAndIncrement, initStore } from "./utils";
-import { WorkersKVStore } from "./kv-store";
-import { env } from "cloudflare:workers";
+} from './types';
+import { getKeyAndIncrement, initStore } from './utils';
 
 /**
  *
@@ -28,16 +28,16 @@ import { env } from "cloudflare:workers";
  * @public
  */
 export function rateLimiter<E extends Env = Env, P extends string = string>(
-  config: GeneralConfigType<RateLimitConfiguration<E, P>>,
+  config: GeneralConfigType<RateLimitConfiguration<E, P>>
 ) {
   const {
     windowMs = 60_000,
     limit = 5,
-    message = "Too many requests, please try again later.",
+    message = 'Too many requests, please try again later.',
     statusCode = 429,
-    standardHeaders = "draft-6",
-    requestPropertyName = "rateLimit",
-    requestStorePropertyName = "rateLimitStore",
+    standardHeaders = 'draft-6',
+    requestPropertyName = 'rateLimit',
+    requestStorePropertyName = 'rateLimitStore',
     skipFailedRequests = false,
     skipSuccessfulRequests = false,
     keyGenerator,
@@ -47,7 +47,7 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
 
       const responseMessage = options.message;
 
-      if (typeof responseMessage === "string") {
+      if (typeof responseMessage === 'string') {
         return new Response(responseMessage, {
           status: options.statusCode,
         });
@@ -56,14 +56,14 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
       return new Response(JSON.stringify(responseMessage), {
         status: options.statusCode,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
     },
     store,
   } = config;
 
-  if (!store) throw new Error("store is required");
+  if (!store) throw new Error('store is required');
   const options = {
     windowMs,
     limit,
@@ -85,7 +85,7 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
   return async () => {
     const { key, totalHits, resetTime } = await getKeyAndIncrement(
       keyGenerator,
-      store,
+      store
     );
     console.log(key, totalHits, resetTime);
 
@@ -100,7 +100,7 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
     // Set the standardized `RateLimit-*` headers on the response object
     // if (standardHeaders && !c.finalized) {
     if (standardHeaders) {
-      if (standardHeaders === "draft-7") {
+      if (standardHeaders === 'draft-7') {
         setDraft7Headers(info, windowMs);
       } else {
         // For true and draft-6
@@ -120,8 +120,9 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
 
     const shouldSkipRequest = async () => {
       if (skipFailedRequests || skipSuccessfulRequests) {
-        const wasRequestSuccessful =
-          await requestWasSuccessful(getResponseStatus());
+        const wasRequestSuccessful = await requestWasSuccessful(
+          getResponseStatus()
+        );
 
         if (
           (skipFailedRequests && !wasRequestSuccessful) ||
@@ -146,7 +147,7 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
 export const rateLimit = rateLimiter({
   windowMs: 60_000,
   limit: 5,
-  standardHeaders: "draft-6",
-  keyGenerator: () => getRequestHeader("cf-connecting-ip") ?? "",
+  standardHeaders: 'draft-6',
+  keyGenerator: () => getRequestHeader('cf-connecting-ip') ?? '',
   store: new WorkersKVStore({ namespace: env.TEMPLATE_CACHE }),
 });

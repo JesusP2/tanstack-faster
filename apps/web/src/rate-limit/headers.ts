@@ -1,5 +1,5 @@
-import type { RateLimitInfo } from "./types";
-import { setResponseHeader} from '@tanstack/react-start/server'
+import { setResponseHeader } from '@tanstack/react-start/server';
+import type { RateLimitInfo } from './types';
 
 /**
  * Returns the number of seconds left for the window to reset. Uses `windowMs`
@@ -10,7 +10,7 @@ import { setResponseHeader} from '@tanstack/react-start/server'
  */
 const getResetSeconds = (
   resetTime?: Date,
-  windowMs?: number,
+  windowMs?: number
 ): number | undefined => {
   let resetSeconds: number | undefined;
   if (resetTime) {
@@ -35,19 +35,20 @@ const getResetSeconds = (
  */
 export const setDraft6Headers = (
   info: RateLimitInfo,
-  windowMs: number,
+  windowMs: number
 ): void => {
   // if (context.finalized) return;
   const windowSeconds = Math.ceil(windowMs / 1000);
   const resetSeconds = getResetSeconds(info.resetTime);
 
-  setResponseHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
-  setResponseHeader('RateLimit-Limit', info.limit.toString())
-  setResponseHeader('RateLimit-Remaining', info.remaining.toString())
+  setResponseHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`);
+  setResponseHeader('RateLimit-Limit', info.limit.toString());
+  setResponseHeader('RateLimit-Remaining', info.remaining.toString());
 
   // Set this header only if the store returns a `resetTime`.
 
-  if(resetSeconds) setResponseHeader('RateLimit-Reset', resetSeconds.toString())
+  if (resetSeconds)
+    setResponseHeader('RateLimit-Reset', resetSeconds.toString());
 };
 
 /**
@@ -59,14 +60,17 @@ export const setDraft6Headers = (
  */
 export const setDraft7Headers = (
   info: RateLimitInfo,
-  windowMs: number,
+  windowMs: number
 ): void => {
   // if (context.finalized) return;
 
   const windowSeconds = Math.ceil(windowMs / 1000);
   const resetSeconds = getResetSeconds(info.resetTime, windowMs);
-  setResponseHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
-  setResponseHeader('RateLimit', `limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds}`)
+  setResponseHeader('RateLimit-Policy', `${info.limit};w=${windowSeconds}`);
+  setResponseHeader(
+    'RateLimit',
+    `limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds}`
+  );
 };
 
 /**
@@ -77,12 +81,12 @@ export const setDraft7Headers = (
  */
 export const setRetryAfterHeader = (
   info: RateLimitInfo,
-  windowMs: number,
+  windowMs: number
 ): void => {
   // if (context.finalized) return;
 
   const resetSeconds = getResetSeconds(info.resetTime, windowMs);
   if (resetSeconds) {
-    setResponseHeader('Retry-After', resetSeconds?.toString())
+    setResponseHeader('Retry-After', resetSeconds?.toString());
   }
 };

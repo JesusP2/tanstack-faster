@@ -84,7 +84,7 @@ export interface RateLimitConfiguration<
    *
    * Defaults to `draft-6`.
    */
-  standardHeaders: boolean | "draft-6" | "draft-7";
+  standardHeaders: boolean | 'draft-6' | 'draft-7';
 
   /**
    * The name of the property on the context object to store the rate limit info.
@@ -149,10 +149,7 @@ export interface RateLimitConfiguration<
 /**
  * An interface that all hit counter stores must implement.
  */
-export type Store<
-  E extends Env = Env,
-  P extends string = string,
-> = {
+export type Store<E extends Env = Env, P extends string = string> = {
   /**
    * Method that initializes the store, and has access to the options passed to
    * the middleware too.
@@ -222,9 +219,9 @@ export type Store<
 
 export type GeneralConfigType<T extends { keyGenerator: unknown }> = Pick<
   T,
-  "keyGenerator"
+  'keyGenerator'
 > &
-  Partial<Omit<T, "keyGenerator">>;
+  Partial<Omit<T, 'keyGenerator'>>;
 
 export type Options<Binding> = {
   /**
