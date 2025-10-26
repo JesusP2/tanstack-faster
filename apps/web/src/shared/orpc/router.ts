@@ -5,5 +5,4 @@ export const orpcRouter = {
   todos,
 };
 export type ORPCRouter = typeof orpcRouter;
-
 export const handler = new RPCHandler(orpcRouter);

@@ -2,6 +2,7 @@ import { env } from 'cloudflare:workers';
 import { ELECTRIC_PROTOCOL_QUERY_PARAMS } from '@electric-sql/client';
 import { createFileRoute } from '@tanstack/react-router';
 import { getAuth } from '@/auth/server';
+import { rateLimit } from '@/rate-limit';
 
 /**
  * Prepares the Electric SQL proxy URL from a request URL
@@ -40,6 +41,8 @@ export async function proxyElectricRequest(originUrl: URL): Promise<Response> {
 }
 
 const serve = async ({ request }: { request: Request }) => {
+  const rateLimitResponse = await rateLimit();
+  if (rateLimitResponse instanceof Response) return rateLimitResponse;
   const auth = getAuth();
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) {

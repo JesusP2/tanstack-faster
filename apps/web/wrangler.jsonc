@@ -4,15 +4,12 @@
 	"main": "@tanstack/react-start/server-entry",
 	"compatibility_date": "2025-07-05",
 	"compatibility_flags": ["nodejs_compat"],
-	"durable_objects": {
-		"bindings": [
-			{
-				"name": "CACHE",
-				"class_name": "DurableObjectRateLimiter"
-			}
-		]
-	},
-	"migrations": [{ "tag": "v1", "new_classes": ["DurableObjectRateLimiter"] }],
+	"kv_namespaces": [
+		{
+			"binding": "TEMPLATE_CACHE",
+			"id": "02edc342e48e4ed9a35936f2c3be8819"
+		}
+	],
 	"observability": {
 		"enabled": true,
 		"logs": {
