@@ -87,8 +87,6 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
       keyGenerator,
       store
     );
-    console.log(key, totalHits, resetTime);
-
     // Define the rate limit info for the client.
     const info: RateLimitInfo = {
       limit,
@@ -146,7 +144,7 @@ export function rateLimiter<E extends Env = Env, P extends string = string>(
 
 export const rateLimit = rateLimiter({
   windowMs: 60_000,
-  limit: 5,
+  limit: 120,
   standardHeaders: 'draft-6',
   keyGenerator: () => getRequestHeader('cf-connecting-ip') ?? '',
   store: new WorkersKVStore({ namespace: env.TEMPLATE_CACHE }),

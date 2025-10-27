@@ -61,6 +61,7 @@
     "tw-animate-css": "^1.2.5",
     "ulidx": "^2.4.1",
     "vaul": "^1.1.2",
+    "vite-plugin-pwa": "^1.1.0",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "catalog:"
   },
