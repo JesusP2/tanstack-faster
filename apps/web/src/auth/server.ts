@@ -1,7 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { admin, anonymous, jwt, magicLink } from 'better-auth/plugins';
+import { admin, anonymous, captcha, jwt, magicLink } from 'better-auth/plugins';
 import { passkey } from 'better-auth/plugins/passkey';
 import { reactStartCookies } from 'better-auth/react-start';
 import { Resend } from 'resend';
@@ -41,6 +41,10 @@ export function getAuth() {
     plugins: [
       jwt(),
       anonymous(),
+      captcha({
+        provider: 'cloudflare-turnstile',
+        secretKey: env.TURNSTILE_SECRET,
+      }),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
           await resend.emails.send({
