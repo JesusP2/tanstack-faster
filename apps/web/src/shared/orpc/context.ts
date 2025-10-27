@@ -1,5 +1,5 @@
-import { getAuth } from "@/auth/server";
-import { getDb } from "@/db";
+import { getAuth } from '@/auth/server';
+import { getDb } from '@/db';
 
 export async function createContext({ req }: { req: Request }) {
   const auth = getAuth();
