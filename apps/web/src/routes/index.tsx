@@ -8,6 +8,7 @@ import { TodosList } from '@/todos/list';
 
 export const Route = createFileRoute('/')({
   component: HomeComponent,
+  ssr: false,
 });
 
 function HomeComponent() {

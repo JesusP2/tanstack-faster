@@ -1,14 +1,7 @@
 import { ORPCError, os } from '@orpc/server';
-import type { Session, User } from '@/auth/server';
-import type { getDb } from '@/db';
+import type { Context } from './context';
 
-export const base = os.$context<{
-  session: {
-    user: User;
-    session: Session;
-  } | null;
-  db: ReturnType<typeof getDb>;
-}>();
+export const base = os.$context<Context>();
 
 const authMiddleware = base.middleware(async ({ next, context }) => {
   if (!context.session) {
