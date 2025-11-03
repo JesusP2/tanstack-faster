@@ -1,4 +1,4 @@
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient } from '@tanstack/react-query';
 import {
   createRootRouteWithContext,
   HeadContent,
@@ -6,17 +6,17 @@ import {
   Scripts,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { Suspense } from 'react';
 import { AuthProvider } from '@/auth/provider';
-import Loader from '@/components/loader';
 import { Toaster } from '@/components/ui/sonner';
-import { queryClient } from '@/shared/query-client';
 import { ThemeProvider } from '@/theme/provider';
 import { ConfirmDialogProvider } from '../components/providers/confirm-dialog';
-import { IsOnlineProvider } from '../components/providers/is-online';
 import appCss from '../index.css?url';
+import { getThemeServerFn } from '@/theme/functions';
+import { useUserQueryOptions } from '@/auth/use-user';
 
-export type RouterAppContext = {};
+export type RouterAppContext = {
+  queryClient: QueryClient;
+};
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
@@ -40,30 +40,28 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
     ],
   }),
   component: RootDocument,
-  // beforeLoad: async () => queryClient.ensureQueryData(useUserQueryOptions()),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(useUserQueryOptions)
+    return getThemeServerFn()
+  }
 });
 
 function RootDocument() {
+  const data = Route.useLoaderData();
   return (
-    <html className="dark" lang="en">
+    <html className={data.theme} lang="en">
       <head>
         <HeadContent />
       </head>
-      <body>
-        <Suspense fallback={<Loader />}>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
-              <IsOnlineProvider>
-                <AuthProvider>
-                  <ConfirmDialogProvider>
-                    <Outlet />
-                    <Toaster richColors />
-                  </ConfirmDialogProvider>
-                </AuthProvider>
-              </IsOnlineProvider>
-            </ThemeProvider>
-          </QueryClientProvider>
-        </Suspense>
+      <body style={data.presetProperties}>
+        <ThemeProvider defaultPreset={data.preset} defaultTheme={data.theme}>
+            <AuthProvider>
+              <ConfirmDialogProvider>
+                <Outlet />
+                <Toaster richColors />
+              </ConfirmDialogProvider>
+            </AuthProvider>
+        </ThemeProvider>
         <TanStackRouterDevtools position="bottom-left" />
         <Scripts />
       </body>

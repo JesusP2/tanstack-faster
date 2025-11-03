@@ -30,7 +30,7 @@ import {
   defaultPresets,
   type Preset,
   presetsArray,
-} from '@/theme/theme-presets';
+} from '@/theme/constants';
 
 type ThemePresetSelectProps = React.ComponentProps<typeof Button>;
 

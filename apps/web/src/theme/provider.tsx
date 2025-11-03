@@ -1,9 +1,10 @@
-import { createContext, useContext, useState } from 'react';
-import { defaultPresets, type Preset } from '@/theme/theme-presets';
+import { createContext, useContext, useState } from "react";
+import { defaultPresets, defaults, type Preset, presetKey, type Theme, themeKey } from "@/theme/constants";
 
-type Theme = 'light' | 'dark';
 type ThemeProviderProps = {
   children: React.ReactNode;
+  defaultPreset?: Preset;
+  defaultTheme?: Theme;
 };
 
 type ThemeProviderState = {
@@ -14,31 +15,41 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  preset: 'mono',
-  theme: 'dark',
+  preset: defaults.preset,
+  theme: defaults.theme,
   setPreset: () => null,
   setTheme: () => null,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-const presetKey = 'preset';
-const themeKey = 'theme';
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  const [preset, setPreset] = useState<Preset>(setPresetInDocument);
-  const [theme, setTheme] = useState<Theme>(setThemeInDocument);
+export function ThemeProvider({ children, defaultPreset = initialState.preset, defaultTheme = initialState.theme, ...props }: ThemeProviderProps) {
+  const [preset, setPreset] = useState<Preset>(setPresetInDocument({
+    defaultPreset,
+    defaultTheme,
+  }));
+  const [theme, setTheme] = useState<Theme>(setThemeInDocument({
+    defaultPreset,
+    defaultTheme,
+  }));
 
   const value = {
     preset,
     theme,
     setPreset: (preset: Preset) => {
       setCookie(presetKey, preset);
-      setPresetInDocument();
+      setPresetInDocument({
+        defaultPreset,
+        defaultTheme,
+      });
       setPreset(preset);
     },
     setTheme: (theme: Theme) => {
       setCookie(themeKey, theme);
-      setThemeInDocument();
+      setThemeInDocument({
+        defaultPreset,
+        defaultTheme,
+      });
       setTheme(theme);
     },
   };
@@ -54,14 +65,14 @@ export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
 
   if (context === undefined)
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
 
   return context;
 };
 
 function setBodyProperties(
   presetName: Preset,
-  theme: Exclude<Theme, 'system'>
+  theme: Exclude<Theme, "system">,
 ) {
   if (globalThis.document === undefined) return;
   const preset = defaultPresets[presetName];
@@ -72,42 +83,70 @@ function setBodyProperties(
   return presetName;
 }
 
-function setThemeInDocument() {
+function setThemeInDocument({
+  defaultPreset,
+  defaultTheme,
+}: {
+    defaultPreset: Preset;
+    defaultTheme: Theme;
+  }) {
   if (globalThis.document === undefined) {
-    return initialState.theme;
+    return defaultTheme;
   }
-  let theme = getCookie(themeKey) as Theme;
+  let theme = getCookie(themeKey, {
+    preset: defaultPreset,
+    theme: defaultTheme,
+  }) as Theme;
   if (!theme) {
-    theme = initialState.theme;
+    theme = defaultTheme;
     setCookie(themeKey, theme);
   }
   const root = window.document.documentElement;
-  root.classList.remove('light', 'dark');
+  root.classList.remove("light", "dark");
   root.classList.add(theme);
-  const preset = getCookie(presetKey) as Preset;
-  setBodyProperties(preset ?? initialState.preset, theme);
+  const preset = getCookie(presetKey, {
+    preset: defaultPreset,
+    theme: defaultTheme,
+  }) as Preset;
+  setBodyProperties(preset ?? defaultPreset, theme);
   return theme;
 }
 
-function setPresetInDocument() {
-  let presetName = getCookie(presetKey) as Preset;
+function setPresetInDocument({
+  defaultPreset,
+  defaultTheme,
+}: {
+    defaultPreset: Preset;
+    defaultTheme: Theme;
+  }) {
+  let presetName = getCookie(presetKey, {
+    preset: defaultPreset,
+    theme: defaultTheme,
+  }) as Preset;
   if (!presetName) {
-    presetName = initialState.preset;
+    presetName = defaultPreset;
     setCookie(presetKey, presetName);
   }
 
-  const theme = (getCookie(themeKey) as Theme) ?? initialState.theme;
+  const theme = (getCookie(themeKey, {
+    preset: defaultPreset,
+    theme: defaultTheme,
+  }) as Theme) ?? defaultTheme;
   setBodyProperties(presetName, theme);
   return presetName;
 }
 
 function setCookie(key: string, value: string) {
   if (globalThis.document === undefined) return;
-  localStorage.setItem(key, value);
+  document.cookie = `${key}=${value}`;
 }
-function getCookie(key: keyof typeof initialState) {
+function getCookie(key: keyof typeof initialState, initialState: {
+  preset: Preset;
+  theme: Theme;
+}) {
   if (globalThis.document === undefined) {
     return initialState[key];
   }
-  return localStorage.getItem(key);
+  const cookie = document.cookie.split("; ").find((c) => c.startsWith(key));
+  return cookie ? cookie.split("=")[1] : null;
 }

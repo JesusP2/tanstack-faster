@@ -2,9 +2,8 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { authClient } from './client';
 import type { User } from './server';
 
-export const useUser = () => useSuspenseQuery(useUserQueryOptions());
-export const useUserQueryOptions = () =>
-  queryOptions({
+export const useUser = () => useSuspenseQuery(useUserQueryOptions);
+export const useUserQueryOptions = queryOptions({
     queryKey: ['user'],
     queryFn: async () => {
       const session = await authClient.getSession();
