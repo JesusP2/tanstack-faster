@@ -25,12 +25,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { defaultPresets, type Preset, presetsArray } from '@/theme/constants';
 import { useTheme } from '@/theme/provider';
-import {
-  defaultPresets,
-  type Preset,
-  presetsArray,
-} from '@/theme/constants';
 
 type ThemePresetSelectProps = React.ComponentProps<typeof Button>;
 

@@ -4,22 +4,22 @@ import type { User } from './server';
 
 export const useUser = () => useSuspenseQuery(useUserQueryOptions);
 export const useUserQueryOptions = queryOptions({
-    queryKey: ['user'],
-    queryFn: async () => {
-      const session = await authClient.getSession();
-      if (!session.data?.session) {
-        const { data: anonymousData } = await authClient.signIn.anonymous();
-        if (!anonymousData?.user) {
-          throw new Error('Failed to get user');
-        }
-        return {
-          ...anonymousData?.user,
-          isAnonymous: true,
-        };
+  queryKey: ['user'],
+  queryFn: async () => {
+    const session = await authClient.getSession();
+    if (!session.data?.session) {
+      const { data: anonymousData } = await authClient.signIn.anonymous();
+      if (!anonymousData?.user) {
+        throw new Error('Failed to get user');
       }
-      return session.data.user
-    },
-  });
+      return {
+        ...anonymousData?.user,
+        isAnonymous: true,
+      };
+    }
+    return session.data.user;
+  },
+});
 
 export function isUserAuthenticated(user: Partial<User>) {
   if (user.isAnonymous) {

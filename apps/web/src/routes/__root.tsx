@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import {
   createRootRouteWithContext,
   HeadContent,
@@ -7,12 +7,12 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { AuthProvider } from '@/auth/provider';
+import { useUserQueryOptions } from '@/auth/use-user';
 import { Toaster } from '@/components/ui/sonner';
+import { getThemeServerFn } from '@/theme/functions';
 import { ThemeProvider } from '@/theme/provider';
 import { ConfirmDialogProvider } from '../components/providers/confirm-dialog';
 import appCss from '../index.css?url';
-import { getThemeServerFn } from '@/theme/functions';
-import { useUserQueryOptions } from '@/auth/use-user';
 
 export type RouterAppContext = {
   queryClient: QueryClient;
@@ -41,9 +41,9 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
   component: RootDocument,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(useUserQueryOptions)
-    return getThemeServerFn()
-  }
+    await context.queryClient.ensureQueryData(useUserQueryOptions);
+    return getThemeServerFn();
+  },
 });
 
 function RootDocument() {
@@ -55,12 +55,12 @@ function RootDocument() {
       </head>
       <body style={data.presetProperties}>
         <ThemeProvider defaultPreset={data.preset} defaultTheme={data.theme}>
-            <AuthProvider>
-              <ConfirmDialogProvider>
-                <Outlet />
-                <Toaster richColors />
-              </ConfirmDialogProvider>
-            </AuthProvider>
+          <AuthProvider>
+            <ConfirmDialogProvider>
+              <Outlet />
+              <Toaster richColors />
+            </ConfirmDialogProvider>
+          </AuthProvider>
         </ThemeProvider>
         <TanStackRouterDevtools position="bottom-left" />
         <Scripts />

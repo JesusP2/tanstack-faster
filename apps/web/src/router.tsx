@@ -1,7 +1,7 @@
 import { QueryCache, QueryClient } from '@tanstack/react-query';
-import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
-import { toast } from 'sonner';
 import { createRouter as createTanStackRouter } from '@tanstack/react-router';
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
+import { toast } from 'sonner';
 import './index.css';
 import { routeTree } from './routeTree.gen';
 
@@ -19,7 +19,7 @@ export const getRouter = () => {
         });
       },
     }),
-  })
+  });
 
   if (import.meta.env.SSR) {
   }
@@ -38,7 +38,7 @@ export const getRouter = () => {
   setupRouterSsrQueryIntegration({
     router,
     queryClient,
-  })
+  });
 
   return router;
 };

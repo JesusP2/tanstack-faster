@@ -1,5 +1,12 @@
-import { createContext, useContext, useState } from "react";
-import { defaultPresets, defaults, type Preset, presetKey, type Theme, themeKey } from "@/theme/constants";
+import { createContext, useContext, useState } from 'react';
+import {
+  defaultPresets,
+  defaults,
+  type Preset,
+  presetKey,
+  type Theme,
+  themeKey,
+} from '@/theme/constants';
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -23,15 +30,24 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-export function ThemeProvider({ children, defaultPreset = initialState.preset, defaultTheme = initialState.theme, ...props }: ThemeProviderProps) {
-  const [preset, setPreset] = useState<Preset>(setPresetInDocument({
-    defaultPreset,
-    defaultTheme,
-  }));
-  const [theme, setTheme] = useState<Theme>(setThemeInDocument({
-    defaultPreset,
-    defaultTheme,
-  }));
+export function ThemeProvider({
+  children,
+  defaultPreset = initialState.preset,
+  defaultTheme = initialState.theme,
+  ...props
+}: ThemeProviderProps) {
+  const [preset, setPreset] = useState<Preset>(
+    setPresetInDocument({
+      defaultPreset,
+      defaultTheme,
+    })
+  );
+  const [theme, setTheme] = useState<Theme>(
+    setThemeInDocument({
+      defaultPreset,
+      defaultTheme,
+    })
+  );
 
   const value = {
     preset,
@@ -65,14 +81,14 @@ export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
 
   if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error('useTheme must be used within a ThemeProvider');
 
   return context;
 };
 
 function setBodyProperties(
   presetName: Preset,
-  theme: Exclude<Theme, "system">,
+  theme: Exclude<Theme, 'system'>
 ) {
   if (globalThis.document === undefined) return;
   const preset = defaultPresets[presetName];
@@ -87,9 +103,9 @@ function setThemeInDocument({
   defaultPreset,
   defaultTheme,
 }: {
-    defaultPreset: Preset;
-    defaultTheme: Theme;
-  }) {
+  defaultPreset: Preset;
+  defaultTheme: Theme;
+}) {
   if (globalThis.document === undefined) {
     return defaultTheme;
   }
@@ -102,7 +118,7 @@ function setThemeInDocument({
     setCookie(themeKey, theme);
   }
   const root = window.document.documentElement;
-  root.classList.remove("light", "dark");
+  root.classList.remove('light', 'dark');
   root.classList.add(theme);
   const preset = getCookie(presetKey, {
     preset: defaultPreset,
@@ -116,9 +132,9 @@ function setPresetInDocument({
   defaultPreset,
   defaultTheme,
 }: {
-    defaultPreset: Preset;
-    defaultTheme: Theme;
-  }) {
+  defaultPreset: Preset;
+  defaultTheme: Theme;
+}) {
   let presetName = getCookie(presetKey, {
     preset: defaultPreset,
     theme: defaultTheme,
@@ -128,10 +144,11 @@ function setPresetInDocument({
     setCookie(presetKey, presetName);
   }
 
-  const theme = (getCookie(themeKey, {
-    preset: defaultPreset,
-    theme: defaultTheme,
-  }) as Theme) ?? defaultTheme;
+  const theme =
+    (getCookie(themeKey, {
+      preset: defaultPreset,
+      theme: defaultTheme,
+    }) as Theme) ?? defaultTheme;
   setBodyProperties(presetName, theme);
   return presetName;
 }
@@ -140,13 +157,16 @@ function setCookie(key: string, value: string) {
   if (globalThis.document === undefined) return;
   document.cookie = `${key}=${value}`;
 }
-function getCookie(key: keyof typeof initialState, initialState: {
-  preset: Preset;
-  theme: Theme;
-}) {
+function getCookie(
+  key: keyof typeof initialState,
+  initialState: {
+    preset: Preset;
+    theme: Theme;
+  }
+) {
   if (globalThis.document === undefined) {
     return initialState[key];
   }
-  const cookie = document.cookie.split("; ").find((c) => c.startsWith(key));
-  return cookie ? cookie.split("=")[1] : null;
+  const cookie = document.cookie.split('; ').find((c) => c.startsWith(key));
+  return cookie ? cookie.split('=')[1] : null;
 }

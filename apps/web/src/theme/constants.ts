@@ -2152,10 +2152,10 @@ export const defaultPresets = {
 
 export const presetsArray = Object.values(defaultPresets);
 export type Preset = keyof typeof defaultPresets;
-export type Theme = "light" | "dark";
-export const presetKey = "preset";
-export const themeKey = "theme";
+export type Theme = 'light' | 'dark';
+export const presetKey = 'preset';
+export const themeKey = 'theme';
 export const defaults = {
   theme: 'dark' as Theme,
-  preset: 'mono' as Preset
-}
+  preset: 'mono' as Preset,
+};
