@@ -1,9 +1,7 @@
-import { env } from 'cloudflare:workers';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema/auth';
+import { env } from '@/shared/env';
 
-export function getDb() {
-  const client = postgres(env.DATABASE_URL);
-  return drizzle(client, { schema });
-}
+const client = postgres(env.DATABASE_URL)
+export const db = drizzle(client, { schema })

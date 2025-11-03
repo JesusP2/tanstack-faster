@@ -7,14 +7,7 @@ export const useUserQueryOptions = () =>
   queryOptions({
     queryKey: ['user'],
     queryFn: async () => {
-      let jwt = null;
-      const session = await authClient.getSession({
-        fetchOptions: {
-          onSuccess: (ctx) => {
-            jwt = ctx.response.headers.get('set-auth-jwt');
-          },
-        },
-      });
+      const session = await authClient.getSession();
       if (!session.data?.session) {
         const { data: anonymousData } = await authClient.signIn.anonymous();
         if (!anonymousData?.user) {
@@ -23,13 +16,9 @@ export const useUserQueryOptions = () =>
         return {
           ...anonymousData?.user,
           isAnonymous: true,
-          jwt: null,
         };
       }
-      return {
-        ...session.data.user,
-        jwt,
-      };
+      return session.data.user
     },
   });
 
