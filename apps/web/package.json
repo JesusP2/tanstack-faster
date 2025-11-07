@@ -60,6 +60,8 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@ai-sdk/openai": "^2.0.62",
+    "@openrouter/ai-sdk-provider": "^1.2.0",
     "@tanstack/react-query-devtools": "^5.85.5",
     "@tanstack/react-router-devtools": "^1.132.31",
     "@testing-library/dom": "^10.4.0",
@@ -69,8 +71,12 @@
     "@types/react-dom": "^19.0.4",
     "@vite-pwa/assets-generator": "^1.0.2",
     "@vitejs/plugin-react": "^5.0.4",
+    "ai": "^5.0.87",
     "drizzle-kit": "^0.31.2",
+    "effect": "^3.18.4",
     "jsdom": "^26.0.0",
+    "openai": "^6.8.0",
+    "slugify": "^1.6.6",
     "typescript": "^5.7.2",
     "vite": "^7.0.2",
     "web-vitals": "^5.0.3",

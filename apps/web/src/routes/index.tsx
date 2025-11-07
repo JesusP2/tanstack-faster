@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ThemeButton } from '@/theme/theme-button';
-import ThemePresetSelect from '@/theme/theme-preset-select';
 
 export const Route = createFileRoute('/')({
   component: HomeComponent,
@@ -13,9 +12,6 @@ function HomeComponent() {
         <h1 className="font-bold text-2xl">Test Template</h1>
         <ThemeButton />
       </header>
-      <div>
-        <ThemePresetSelect />
-      </div>
     </div>
   );
 }
