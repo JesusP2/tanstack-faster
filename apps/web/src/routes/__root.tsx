@@ -1,18 +1,20 @@
-import type { QueryClient } from '@tanstack/react-query';
+import type { QueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
   HeadContent,
+  Link,
   Outlet,
   Scripts,
-} from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { AuthProvider } from '@/auth/provider';
-import { useUserQueryOptions } from '@/auth/use-user';
-import { Toaster } from '@/components/ui/sonner';
-import { getThemeServerFn } from '@/theme/functions';
-import { ThemeProvider } from '@/theme/provider';
-import { ConfirmDialogProvider } from '../components/providers/confirm-dialog';
-import appCss from '../index.css?url';
+} from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { AuthProvider } from "@/auth/provider";
+import { useUserQueryOptions } from "@/auth/use-user";
+import { Toaster } from "@/components/ui/sonner";
+import { getThemeServerFn } from "@/theme/functions";
+import { ThemeProvider } from "@/theme/provider";
+import { ConfirmDialogProvider } from "../components/providers/confirm-dialog";
+import appCss from "../index.css?url";
+import { Suspense } from "react";
 
 export type RouterAppContext = {
   queryClient: QueryClient;
@@ -22,19 +24,19 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'My App',
+        title: "My App",
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
     ],

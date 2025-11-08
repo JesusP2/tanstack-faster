@@ -1,19 +1,19 @@
-import { db } from "@/db";
+import dotenv from 'dotenv';
+import { Effect, Schedule } from 'effect';
+import slugify from 'slugify';
+import { db } from '@/db';
 import {
   products as productsTable,
   subcategories as subcategoriesTable,
-} from "@/db/schema";
-import dotenv from "dotenv";
-import { Effect, Schedule } from "effect";
-import slugify from "slugify";
+} from '@/db/schema';
 
 dotenv.config({
-  path: "./.env",
+  path: './.env',
 });
 
 const main = Effect.gen(function* () {
   const subcategories = yield* Effect.tryPromise(() =>
-    db.select().from(subcategoriesTable),
+    db.select().from(subcategoriesTable)
   );
 
   yield* Effect.all(
@@ -33,13 +33,13 @@ const main = Effect.gen(function* () {
                 subcategory_slug: subcat.slug,
                 price: Math.floor(Math.random() * 100).toString(),
               });
-            }),
+            })
           );
-        }),
+        })
       ).pipe(
         Effect.andThen(() => console.log(`Inserted ${subcat.name} products`)),
-        Effect.catchAll(() => Effect.void),
-      ),
+        Effect.catchAll(() => Effect.void)
+      )
     ),
     {
       concurrency: 10,
@@ -48,6 +48,6 @@ const main = Effect.gen(function* () {
 });
 
 const exit = await Effect.runPromiseExit(
-  main.pipe(Effect.retry({ schedule: Schedule.spaced("1 seconds") })),
+  main.pipe(Effect.retry({ schedule: Schedule.spaced('1 seconds') }))
 );
 console.log(exit.toString());

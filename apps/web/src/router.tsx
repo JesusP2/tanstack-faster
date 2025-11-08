@@ -1,9 +1,9 @@
-import { QueryCache, QueryClient } from "@tanstack/react-query";
-import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
-import { toast } from "sonner";
-import "./index.css";
-import { routeTree } from "./routeTree.gen";
+import { QueryCache, QueryClient } from '@tanstack/react-query';
+import { createRouter as createTanStackRouter } from '@tanstack/react-router';
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
+import { toast } from 'sonner';
+import './index.css';
+import { routeTree } from './routeTree.gen';
 
 export const getRouter = () => {
   const queryClient = new QueryClient({
@@ -11,7 +11,7 @@ export const getRouter = () => {
       onError: (error) => {
         toast.error(error.message, {
           action: {
-            label: "retry",
+            label: 'retry',
             onClick: () => {
               queryClient.invalidateQueries();
             },
@@ -28,6 +28,7 @@ export const getRouter = () => {
     context: {
       queryClient,
     },
+    defaultPreload: 'viewport',
     defaultPendingComponent: () => <div>default pending component</div>,
     defaultNotFoundComponent: () => <div>Not Found</div>,
     Wrap: ({ children }) => <>{children}</>,
@@ -40,7 +41,7 @@ export const getRouter = () => {
   return router;
 };
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface Register {
     router: ReturnType<typeof getRouter>;
   }

@@ -1,22 +1,22 @@
-import OpenAI from "openai";
-import slugify from "slugify";
-import { db } from "../src/db";
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateObject } from 'ai';
+import dotenv from 'dotenv';
+import { eq, isNull } from 'drizzle-orm';
+import fs from 'fs';
+import OpenAI from 'openai';
+import slugify from 'slugify';
+import { ulid } from 'ulidx';
+import { z } from 'zod';
+import { db } from '../src/db';
 import {
   categories,
   collections,
   subcategories,
   subcollections,
-} from "../src/db/schema";
-import { eq, isNull } from "drizzle-orm";
-import { generateObject } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
-import { z } from "zod";
-import dotenv from "dotenv";
-import fs from "fs";
-import { ulid } from "ulidx";
+} from '../src/db/schema';
 
 dotenv.config({
-  path: "./.env",
+  path: './.env',
 });
 
 const openai = new OpenAI();
@@ -41,9 +41,7 @@ Remember, ONLY RETURN THE JSON of 20 unique categories and nothing else.
   
 MAKE SURE THERE ARE 20 CATEGORIES IN THE OUTPUT.`;
 
-const getCollections = async () => {
-  return await db.select().from(collections);
-};
+const getCollections = async () => await db.select().from(collections);
 
 // generate 20 categories per each collection
 const generateCategories = async () => {
@@ -52,7 +50,7 @@ const generateCategories = async () => {
 
   const promises = c.slice(50, 100).map(async (col) => {
     const { object } = await generateObject({
-      model: client.languageModel("gpt-4o-mini"),
+      model: client.languageModel('gpt-4o-mini'),
       providerOptions: {
         openai: {
           structuredOutputs: true,
@@ -81,9 +79,7 @@ const generateCategories = async () => {
 };
 // generateCategories();
 
-const getCategories = async () => {
-  return await db.select().from(categories);
-};
+const getCategories = async () => await db.select().from(categories);
 
 // generate 10 subcollections per each category
 const generateSubCollections = async () => {
@@ -95,7 +91,7 @@ const generateSubCollections = async () => {
     const data = [] as any;
     const promises = c.slice(i * step, i * step + step).map(async (cat) => {
       const { object } = await generateObject({
-        model: client.languageModel("gpt-4o-mini"),
+        model: client.languageModel('gpt-4o-mini'),
         providerOptions: {
           openai: {
             structuredOutputs: true,
@@ -149,16 +145,16 @@ const getSubcollections = async () => {
     .from(subcollections)
     .leftJoin(
       subcategories,
-      eq(subcollections.id, subcategories.subcollection_id),
+      eq(subcollections.id, subcategories.subcollection_id)
     )
     .where(isNull(subcategories.subcollection_id))
-    .offset(7000)
+    .offset(7000);
   return result;
 };
 
 const generateSubcategories = async () => {
   const subcollections = (await getSubcollections()).map(
-    (c) => c.subcollections,
+    (c) => c.subcollections
   );
 
   const step = 5;
@@ -171,7 +167,7 @@ const generateSubcategories = async () => {
       .slice(i * step, i * step + step)
       .map(async (subcol) => {
         const { object } = await generateObject({
-          model: client.languageModel("gpt-4o-mini"),
+          model: client.languageModel('gpt-4o-mini'),
           providerOptions: {
             openai: {
               structuredOutputs: true,
@@ -212,7 +208,7 @@ const generateSubcategories = async () => {
       });
 
     await Promise.all(promises);
-    console.log('adding subcategories:', data.length)
+    console.log('adding subcategories:', data.length);
     await db.insert(subcategories).values(data).onConflictDoNothing();
     await new Promise((resolve) => setTimeout(resolve, 5000));
   }
@@ -245,19 +241,19 @@ const generateBatchFile = async () => {
 
   arr.forEach((subcat) => {
     const custom_id = subcat.slug;
-    const method = "POST";
-    const url = "/v1/chat/completions";
+    const method = 'POST';
+    const url = '/v1/chat/completions';
     const body = {
-      model: "gpt-4o-mini",
+      model: 'gpt-4o-mini',
       messages: [
-        { role: "system", content: productSystemMessage },
-        { role: "user", content: `Category name: ${subcat.name}` },
+        { role: 'system', content: productSystemMessage },
+        { role: 'user', content: `Category name: ${subcat.name}` },
       ],
     };
 
     const line = `{"custom_id": "${custom_id}", "method": "${method}", "url": "${url}", "body": ${JSON.stringify(body)}}`;
 
-    fs.appendFile("scripts/req.jsonl", line + "\n", (err: any) => {
+    fs.appendFile('scripts/req.jsonl', line + '\n', (err: any) => {
       if (err) {
         console.error(err);
         return;
@@ -270,8 +266,8 @@ const generateBatchFile = async () => {
 
 const uploadBatchFile = async () => {
   const file = await openai.files.create({
-    file: fs.createReadStream("scripts/req.jsonl"),
-    purpose: "batch",
+    file: fs.createReadStream('scripts/req.jsonl'),
+    purpose: 'batch',
   });
 
   console.log(file);
@@ -281,9 +277,9 @@ const uploadBatchFile = async () => {
 
 const createBatch = async () => {
   const batch = await openai.batches.create({
-    input_file_id: "",
-    endpoint: "/v1/chat/completions",
-    completion_window: "24h",
+    input_file_id: '',
+    endpoint: '/v1/chat/completions',
+    completion_window: '24h',
   });
 
   console.log(batch);
@@ -292,22 +288,22 @@ const createBatch = async () => {
 // createBatch();
 
 const checkBatchStatus = async () => {
-  const batch = await openai.batches.retrieve("");
+  const batch = await openai.batches.retrieve('');
   console.log(batch);
 };
 
 // checkBatchStatus();
 
 const downloadBatch = async () => {
-  const fileResponse = await openai.files.content("");
+  const fileResponse = await openai.files.content('');
   const fileContents = await fileResponse.text();
 
-  fs.appendFile("scripts/out.jsonl", fileContents, (err: any) => {
+  fs.appendFile('scripts/out.jsonl', fileContents, (err: any) => {
     if (err) {
       console.error(err);
       return;
     }
-    console.log("File has been saved");
+    console.log('File has been saved');
   });
 };
 
