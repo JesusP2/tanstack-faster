@@ -1,7 +1,11 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { useServerFn } from '@tanstack/react-start'
+import { getSearchResults } from '@/lib/functions'
+import { useRouteContext } from '@tanstack/react-router'
 
 function useDebounce<T>(value: T, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -14,67 +18,35 @@ function useDebounce<T>(value: T, delay: number) {
   return [debouncedValue, setDebouncedValue] as const
 }
 
-// Simulated API call
-const fetchSuggestions = async (query: string): Promise<string[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 300)) // Simulate network delay
-  const allSuggestions = [
-    'React',
-    'Redux',
-    'Next.js',
-    'TypeScript',
-    'JavaScript',
-    'Node.js',
-    'Express',
-    'MongoDB',
-    'PostgreSQL',
-    'GraphQL',
-    'Vue.js',
-    'Angular',
-    'Svelte',
-    'Tailwind CSS',
-    'Sass',
-    'Webpack',
-    'Babel',
-    'ESLint',
-    'Jest',
-    'Cypress',
-  ]
-  return allSuggestions.filter((suggestion) =>
-    suggestion.toLowerCase().includes(query.toLowerCase()),
-  )
-}
-
 interface AutoCompleteProps {
   value?: string
   onChange?: (value: string) => void
 }
 
 export default function Autocomplete({ value = '', onChange }: AutoCompleteProps) {
+  const context = useRouteContext({
+    from: '__root__'
+  })
   const [query, setQuery] = useState(value)
   const [debouncedQuery] = useDebounce(query, 300)
-  const [suggestions, setSuggestions] = useState<string[]>([])
   const [selectedIndex, setSelectedIndex] = useState(-1)
-  const [isLoading, setIsLoading] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
+  const fn = useServerFn(getSearchResults)
+  const { data: suggestions, isRefetching: isLoading } = useQuery({
+    queryKey: ['search', debouncedQuery],
+    queryFn: () => fetchSuggestionsCallback(debouncedQuery),
+    initialData: [],
+  })
 
-  const fetchSuggestionsCallback = useCallback(async (q: string) => {
+  const fetchSuggestionsCallback = async (q: string) => {
     if (q.trim() === '') {
-      setSuggestions([])
-      return
+      return []
     }
-    setIsLoading(true)
-    const results = await fetchSuggestions(q)
-    setSuggestions(results)
-    setIsLoading(false)
-  }, [])
-
-  useEffect(() => {
-    if (debouncedQuery && isFocused) {
-      fetchSuggestionsCallback(debouncedQuery)
-    } else {
-      setSuggestions([])
-    }
-  }, [debouncedQuery, fetchSuggestionsCallback, isFocused])
+    const results = await fn({
+      data: { searchTerm: q },
+    })
+    return results
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
@@ -93,11 +65,11 @@ export default function Autocomplete({ value = '', onChange }: AutoCompleteProps
       e.preventDefault()
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1))
     } else if (e.key === 'Enter' && selectedIndex >= 0) {
-      setQuery(suggestions[selectedIndex])
-      setSuggestions([])
+      setQuery(suggestions[selectedIndex].name)
+      context.queryClient.setQueryData(['search', debouncedQuery], [])
       setSelectedIndex(-1)
     } else if (e.key === 'Escape') {
-      setSuggestions([])
+      context.queryClient.setQueryData(['search', debouncedQuery], [])
       setSelectedIndex(-1)
     }
   }
@@ -105,7 +77,7 @@ export default function Autocomplete({ value = '', onChange }: AutoCompleteProps
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion)
     onChange?.(suggestion)
-    setSuggestions([])
+    context.queryClient.setQueryData(['search', debouncedQuery], [])
     setSelectedIndex(-1)
   }
 
@@ -117,7 +89,7 @@ export default function Autocomplete({ value = '', onChange }: AutoCompleteProps
     // Delay hiding suggestions to allow for click events on suggestions
     setTimeout(() => {
       setIsFocused(false)
-      setSuggestions([])
+      context.queryClient.setQueryData(['search', debouncedQuery], [])
       setSelectedIndex(-1)
     }, 200)
   }
@@ -164,15 +136,15 @@ export default function Autocomplete({ value = '', onChange }: AutoCompleteProps
         >
           {suggestions.map((suggestion, index) => (
             <li
-              key={suggestion}
+              key={suggestion.slug}
               className={`px-4 py-2 cursor-pointer hover:bg-muted ${
                 index === selectedIndex ? 'bg-muted' : ''
               }`}
-              onClick={() => handleSuggestionClick(suggestion)}
+              onClick={() => handleSuggestionClick(suggestion.name)}
               role="option"
               aria-selected={index === selectedIndex}
             >
-              {suggestion}
+              {suggestion.name}
             </li>
           ))}
         </ul>

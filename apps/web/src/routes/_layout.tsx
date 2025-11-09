@@ -21,9 +21,8 @@ function RouteComponent() {
             <li className="w-full" key={collection.slug}>
               <Link
                 className="block w-full py-1 text-gray-800 text-xs hover:bg-accent2 hover:underline"
-                href={`/${collection.slug}`}
                 params={{
-                  collection: 'hi',
+                  collection: collection.slug,
                 }}
                 to="/$collection"
               >

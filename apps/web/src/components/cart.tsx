@@ -1,7 +1,8 @@
-import { getCart } from "@/lib/functions";
+import { getCartOptions } from "@/lib/cart";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-export async function Cart() {
-  const cart = await getCart();
+export function Cart() {
+  const { data: cart } = useSuspenseQuery(getCartOptions)
   if (cart.length == 0) {
     return null;
   }

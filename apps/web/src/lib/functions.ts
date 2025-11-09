@@ -10,7 +10,7 @@ import {
   subcategories,
   subcollections,
 } from "@/db/schema";
-import { getCookie, getCookies } from "@tanstack/react-start/server";
+import { setResponseHeader } from "@tanstack/react-start/server";
 
 export const getCollections = createServerFn().handler(async () =>
   db.query.collections.findMany({
@@ -266,7 +266,15 @@ export const getSearchResults = createServerFn()
         );
     }
 
-    return results;
+    const searchResults = results.map((item) => {
+      const to = `/products/${item.categories.slug}/${item.subcategories.slug}/${item.products.slug}`;
+      return {
+        ...item.products,
+        to,
+      };
+    });
+    setResponseHeader("Cache-Control", "max-age=600");
+    return searchResults;
   });
 export const searchOptions = (searchTerm: string) =>
   queryOptions({
