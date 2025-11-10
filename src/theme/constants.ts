@@ -2156,6 +2156,6 @@ export type Theme = 'light' | 'dark';
 export const presetKey = 'preset';
 export const themeKey = 'theme';
 export const defaults = {
-  theme: 'dark' as Theme,
+  theme: 'light' as Theme,
   preset: 'mono' as Preset,
 };
