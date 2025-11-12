@@ -1,10 +1,10 @@
-import { detailedCartOptions } from "@/lib/cart";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { detailedCartOptions, getCartOptions, removeFromCart } from "@/lib/cart";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { Suspense } from "react";
 
-export const Route = createFileRoute("/_layout/order/")({
+export const Route = createFileRoute("/order/")({
   component: RouteComponent,
 });
 
@@ -66,11 +66,28 @@ function RouteComponent() {
 }
 
 function CartItem({ product }: { product: any }) {
+  const { queryClient} = useRouteContext({
+    from: '__root__'
+  })
+  const mutation = useMutation({
+    mutationKey: ["remove-from-cart", product.slug],
+    mutationFn: removeFromCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries(detailedCartOptions);
+      queryClient.invalidateQueries(getCartOptions);
+    },
+  })
   if (!product) {
     return null;
   }
-  // limit to 2 decimal places
+
   const cost = (Number(product.price) * product.quantity).toFixed(2);
+
+  function handleSubmit(formData: FormData) {
+    mutation.mutate({
+      data: formData,
+    });
+  }
   return (
     <div className="flex flex-row items-center justify-between border-t border-gray-200 pt-4">
       <Link
@@ -86,7 +103,7 @@ function CartItem({ product }: { product: any }) {
             <img
               loading="eager"
               decoding="sync"
-              src={product.image_url ?? "/placeholder.svg"}
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi-xMoDjjaArHWcEuGxU3YW_VNCU00gd_2-Q&s"
               alt="Product"
               width={256}
               height={256}
@@ -110,7 +127,7 @@ function CartItem({ product }: { product: any }) {
             <p className="font-semibold">${cost}</p>
           </div>
         </div>
-        <form action={() => {}}>
+        <form action={handleSubmit}>
           <button type="submit">
             <input type="hidden" name="productSlug" value={product.slug} />
             <X className="h-6 w-6" />

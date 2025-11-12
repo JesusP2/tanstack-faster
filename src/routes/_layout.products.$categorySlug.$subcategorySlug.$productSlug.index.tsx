@@ -32,7 +32,7 @@ function RouteComponent() {
   );
   return (
     <div className="container p-4">
-      <h1 className="border-t-2 pt-1 font-bold text-accent1 text-xl">
+      <h1 className="border-t-2 pt-1 font-bold text-xl">
         {productData.name}
       </h1>
       <div className="flex flex-col gap-2">

@@ -21,7 +21,7 @@ function RouteComponent() {
   );
 }
 
-export async function OrderHistoryDynamic() {
+export function OrderHistoryDynamic() {
   const user = useUser();
   return user ? (
     <div className="border-t border-gray-200 pt-4">

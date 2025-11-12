@@ -10,10 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as OrderIndexRouteImport } from './routes/order.index'
 import { Route as LayoutIndexRouteImport } from './routes/_layout.index'
 import { Route as AuthIdRouteImport } from './routes/auth.$id'
 import { Route as LayoutCollectionRouteImport } from './routes/_layout.$collection'
-import { Route as LayoutOrderIndexRouteImport } from './routes/_layout.order.index'
 import { Route as LayoutOrderHistoryIndexRouteImport } from './routes/_layout.order-history.index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as LayoutProductsCategorySlugIndexRouteImport } from './routes/_layout.products.$categorySlug.index'
@@ -22,6 +22,11 @@ import { Route as LayoutProductsCategorySlugSubcategorySlugProductSlugIndexRoute
 
 const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderIndexRoute = OrderIndexRouteImport.update({
+  id: '/order/',
+  path: '/order/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LayoutIndexRoute = LayoutIndexRouteImport.update({
@@ -37,11 +42,6 @@ const AuthIdRoute = AuthIdRouteImport.update({
 const LayoutCollectionRoute = LayoutCollectionRouteImport.update({
   id: '/$collection',
   path: '/$collection',
-  getParentRoute: () => LayoutRoute,
-} as any)
-const LayoutOrderIndexRoute = LayoutOrderIndexRouteImport.update({
-  id: '/order/',
-  path: '/order/',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutOrderHistoryIndexRoute = LayoutOrderHistoryIndexRouteImport.update({
@@ -77,9 +77,9 @@ export interface FileRoutesByFullPath {
   '/$collection': typeof LayoutCollectionRoute
   '/auth/$id': typeof AuthIdRoute
   '/': typeof LayoutIndexRoute
+  '/order': typeof OrderIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/order-history': typeof LayoutOrderHistoryIndexRoute
-  '/order': typeof LayoutOrderIndexRoute
   '/products/$categorySlug': typeof LayoutProductsCategorySlugIndexRoute
   '/products/$categorySlug/$subcategorySlug': typeof LayoutProductsCategorySlugSubcategorySlugIndexRoute
   '/products/$categorySlug/$subcategorySlug/$productSlug': typeof LayoutProductsCategorySlugSubcategorySlugProductSlugIndexRoute
@@ -88,9 +88,9 @@ export interface FileRoutesByTo {
   '/$collection': typeof LayoutCollectionRoute
   '/auth/$id': typeof AuthIdRoute
   '/': typeof LayoutIndexRoute
+  '/order': typeof OrderIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/order-history': typeof LayoutOrderHistoryIndexRoute
-  '/order': typeof LayoutOrderIndexRoute
   '/products/$categorySlug': typeof LayoutProductsCategorySlugIndexRoute
   '/products/$categorySlug/$subcategorySlug': typeof LayoutProductsCategorySlugSubcategorySlugIndexRoute
   '/products/$categorySlug/$subcategorySlug/$productSlug': typeof LayoutProductsCategorySlugSubcategorySlugProductSlugIndexRoute
@@ -101,9 +101,9 @@ export interface FileRoutesById {
   '/_layout/$collection': typeof LayoutCollectionRoute
   '/auth/$id': typeof AuthIdRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/order/': typeof OrderIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_layout/order-history/': typeof LayoutOrderHistoryIndexRoute
-  '/_layout/order/': typeof LayoutOrderIndexRoute
   '/_layout/products/$categorySlug/': typeof LayoutProductsCategorySlugIndexRoute
   '/_layout/products/$categorySlug/$subcategorySlug/': typeof LayoutProductsCategorySlugSubcategorySlugIndexRoute
   '/_layout/products/$categorySlug/$subcategorySlug/$productSlug/': typeof LayoutProductsCategorySlugSubcategorySlugProductSlugIndexRoute
@@ -114,9 +114,9 @@ export interface FileRouteTypes {
     | '/$collection'
     | '/auth/$id'
     | '/'
+    | '/order'
     | '/api/auth/$'
     | '/order-history'
-    | '/order'
     | '/products/$categorySlug'
     | '/products/$categorySlug/$subcategorySlug'
     | '/products/$categorySlug/$subcategorySlug/$productSlug'
@@ -125,9 +125,9 @@ export interface FileRouteTypes {
     | '/$collection'
     | '/auth/$id'
     | '/'
+    | '/order'
     | '/api/auth/$'
     | '/order-history'
-    | '/order'
     | '/products/$categorySlug'
     | '/products/$categorySlug/$subcategorySlug'
     | '/products/$categorySlug/$subcategorySlug/$productSlug'
@@ -137,9 +137,9 @@ export interface FileRouteTypes {
     | '/_layout/$collection'
     | '/auth/$id'
     | '/_layout/'
+    | '/order/'
     | '/api/auth/$'
     | '/_layout/order-history/'
-    | '/_layout/order/'
     | '/_layout/products/$categorySlug/'
     | '/_layout/products/$categorySlug/$subcategorySlug/'
     | '/_layout/products/$categorySlug/$subcategorySlug/$productSlug/'
@@ -148,6 +148,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   LayoutRoute: typeof LayoutRouteWithChildren
   AuthIdRoute: typeof AuthIdRoute
+  OrderIndexRoute: typeof OrderIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -158,6 +159,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof LayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order/': {
+      id: '/order/'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_layout/': {
@@ -179,13 +187,6 @@ declare module '@tanstack/react-router' {
       path: '/$collection'
       fullPath: '/$collection'
       preLoaderRoute: typeof LayoutCollectionRouteImport
-      parentRoute: typeof LayoutRoute
-    }
-    '/_layout/order/': {
-      id: '/_layout/order/'
-      path: '/order'
-      fullPath: '/order'
-      preLoaderRoute: typeof LayoutOrderIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/order-history/': {
@@ -230,7 +231,6 @@ interface LayoutRouteChildren {
   LayoutCollectionRoute: typeof LayoutCollectionRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutOrderHistoryIndexRoute: typeof LayoutOrderHistoryIndexRoute
-  LayoutOrderIndexRoute: typeof LayoutOrderIndexRoute
   LayoutProductsCategorySlugIndexRoute: typeof LayoutProductsCategorySlugIndexRoute
   LayoutProductsCategorySlugSubcategorySlugIndexRoute: typeof LayoutProductsCategorySlugSubcategorySlugIndexRoute
   LayoutProductsCategorySlugSubcategorySlugProductSlugIndexRoute: typeof LayoutProductsCategorySlugSubcategorySlugProductSlugIndexRoute
@@ -240,7 +240,6 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutCollectionRoute: LayoutCollectionRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutOrderHistoryIndexRoute: LayoutOrderHistoryIndexRoute,
-  LayoutOrderIndexRoute: LayoutOrderIndexRoute,
   LayoutProductsCategorySlugIndexRoute: LayoutProductsCategorySlugIndexRoute,
   LayoutProductsCategorySlugSubcategorySlugIndexRoute:
     LayoutProductsCategorySlugSubcategorySlugIndexRoute,
@@ -254,6 +253,7 @@ const LayoutRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   LayoutRoute: LayoutRouteWithChildren,
   AuthIdRoute: AuthIdRoute,
+  OrderIndexRoute: OrderIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

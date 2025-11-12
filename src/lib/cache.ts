@@ -5,32 +5,32 @@ import { env } from "@/shared/env";
 let redisClient: Redis | null = null;
 
 function getRedisClient(): Redis {
-	if (!redisClient) {
-		redisClient = new Redis(env.REDIS_URL, {
-			maxRetriesPerRequest: 3,
-			retryStrategy: (times) => {
-				const delay = Math.min(times * 50, 2000);
-				return delay;
-			},
-		});
+  if (!redisClient) {
+    redisClient = new Redis(env.REDIS_URL, {
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      },
+    });
 
-		redisClient.on("error", (error) => {
-			console.error("Redis connection error:", error);
-		});
+    redisClient.on("error", (error) => {
+      console.error("Redis connection error:", error);
+    });
 
-		redisClient.on("connect", () => {
-			console.log("Redis connected successfully");
-		});
-	}
-	return redisClient;
+    redisClient.on("connect", () => {
+      console.log("Redis connected successfully");
+    });
+  }
+  return redisClient;
 }
 
 /**
  * Generate a cache key from function name and input data
  */
 function generateCacheKey(functionName: string, input?: unknown): string {
-	const inputStr = input ? JSON.stringify(input) : "";
-	return `cache:${functionName}:${inputStr}`;
+  const inputStr = input ? JSON.stringify(input) : "";
+  return `cache:${functionName}:${inputStr}`;
 }
 
 /**
@@ -42,33 +42,33 @@ function generateCacheKey(functionName: string, input?: unknown): string {
  * @returns A Promise with the cached or fresh result
  */
 export async function withCache<T>(
-	fn: () => Promise<T>,
-	functionName: string,
-	input?: unknown,
-	ttlSeconds = 7200, // 2 hours default
+  fn: () => Promise<T>,
+  functionName: string,
+  input?: unknown,
+  ttlSeconds = 7200, // 2 hours default
 ): Promise<T> {
-	const redis = getRedisClient();
-	const cacheKey = generateCacheKey(functionName, input);
+  const redis = getRedisClient();
+  const cacheKey = generateCacheKey(functionName, input);
 
-	try {
-		// Try to get from cache
-		const cached = await redis.get(cacheKey);
-		if (cached) {
-			return JSON.parse(cached) as T;
-		}
+  try {
+    // Try to get from cache
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached) as T;
+    }
 
-		// Cache miss - execute function
-		const result = await fn();
+    // Cache miss - execute function
+    const result = await fn();
 
-		// Store in cache
-		await redis.setex(cacheKey, ttlSeconds, JSON.stringify(result));
+    // Store in cache
+    await redis.setex(cacheKey, ttlSeconds, JSON.stringify(result));
 
-		return result;
-	} catch (error) {
-		// If Redis fails, fall back to executing the function
-		console.error(`Cache error for ${functionName}:`, error);
-		return fn();
-	}
+    return result;
+  } catch (error) {
+    // If Redis fails, fall back to executing the function
+    console.error(`Cache error for ${functionName}:`, error);
+    return fn();
+  }
 }
 
 /**
@@ -76,15 +76,15 @@ export async function withCache<T>(
  * @param pattern - Redis key pattern (e.g., "cache:getProductDetails:*")
  */
 export async function invalidateCache(pattern: string): Promise<void> {
-	const redis = getRedisClient();
-	try {
-		const keys = await redis.keys(pattern);
-		if (keys.length > 0) {
-			await redis.del(...keys);
-		}
-	} catch (error) {
-		console.error(`Cache invalidation error for pattern ${pattern}:`, error);
-	}
+  const redis = getRedisClient();
+  try {
+    const keys = await redis.keys(pattern);
+    if (keys.length > 0) {
+      await redis.del(...keys);
+    }
+  } catch (error) {
+    console.error(`Cache invalidation error for pattern ${pattern}:`, error);
+  }
 }
 
 /**
@@ -92,6 +92,5 @@ export async function invalidateCache(pattern: string): Promise<void> {
  * @param functionName - The function name to clear cache for
  */
 export async function clearFunctionCache(functionName: string): Promise<void> {
-	await invalidateCache(`cache:${functionName}:*`);
+  await invalidateCache(`cache:${functionName}:*`);
 }
-
