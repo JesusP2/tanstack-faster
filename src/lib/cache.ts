@@ -94,3 +94,10 @@ export async function invalidateCache(pattern: string): Promise<void> {
 export async function clearFunctionCache(functionName: string): Promise<void> {
   await invalidateCache(`cache:${functionName}:*`);
 }
+
+/**
+ * Clear all cache entries
+ */
+export async function clearAllCache(): Promise<void> {
+  await invalidateCache("cache:*");
+}

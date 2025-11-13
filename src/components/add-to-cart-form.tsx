@@ -26,7 +26,7 @@ export function AddToCartForm({ productSlug }: { productSlug: string }) {
       <div className="flex flex-row gap-2">
       <button
         type="submit"
-        className="max-w-[150px] rounded-[2px] bg-blue-500 px-5 py-1 text-sm font-semibold text-white"
+        className="max-w-[150px] rounded-[2px] bg-accent1 px-5 py-1 text-sm font-semibold text-white"
       >
         Add to cart
       </button>

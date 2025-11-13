@@ -13,23 +13,6 @@ export const auth = betterAuth({
   }),
   rateLimit: {
     window: 10,
-    //   customStorage: {
-    //     get: async (key) => {
-    //       const value = await env.TEMPLATE_CACHE.get(key);
-    //       if (!value) throw new Error("Not found");
-    //       const parsed = JSON.parse(value);
-    //       return {
-    //         key: parsed.key,
-    //         count: parsed.count,
-    //         lastRequest: parsed.lastRequest,
-    //       };
-    //     },
-    //     set: async (key, value) => {
-    //       env.TEMPLATE_CACHE.put(key, JSON.stringify(value), {
-    //         expirationTtl: 10,
-    //       });
-    //     },
-    //   },
   },
   plugins: [
     anonymous(),
