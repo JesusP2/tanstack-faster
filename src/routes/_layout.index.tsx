@@ -1,8 +1,9 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { collectionsOptions, productCountOptions } from '@/lib/functions';
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { collectionsOptions, productCountOptions } from "@/lib/functions";
+import { Image } from "@/components/image";
 
-export const Route = createFileRoute('/_layout/')({
+export const Route = createFileRoute("/_layout/")({
   component: HomeComponent,
   beforeLoad: async ({ context }) => {
     Promise.all([
@@ -32,13 +33,13 @@ function HomeComponent() {
                 params={{ categorySlug: category.slug }}
                 to="/products/$categorySlug"
               >
-                <img
+                <Image
                   alt={`A small picture of ${category.name}`}
                   className="mb-2 h-14 w-14 border hover:bg-accent2"
                   decoding="sync"
                   height={48}
-                  loading={imageCount++ < 15 ? 'eager' : 'lazy'}
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi-xMoDjjaArHWcEuGxU3YW_VNCU00gd_2-Q&s"
+                  loading={imageCount++ < 15 ? "eager" : "lazy"}
+                  src={category.image_url ?? 'placeholder.jpg'}
                   width={48}
                 />
                 <span className="text-xs">{category.name}</span>

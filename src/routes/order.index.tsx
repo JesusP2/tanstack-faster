@@ -1,8 +1,13 @@
-import { detailedCartOptions, getCartOptions, removeFromCart } from "@/lib/cart";
+import {
+  detailedCartOptions,
+  getCartOptions,
+  removeFromCart,
+} from "@/lib/cart";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { Suspense } from "react";
+import { Image } from "@/components/image";
 
 export const Route = createFileRoute("/order/")({
   component: RouteComponent,
@@ -66,9 +71,9 @@ function RouteComponent() {
 }
 
 function CartItem({ product }: { product: any }) {
-  const { queryClient} = useRouteContext({
-    from: '__root__'
-  })
+  const { queryClient } = useRouteContext({
+    from: "__root__",
+  });
   const mutation = useMutation({
     mutationKey: ["remove-from-cart", product.slug],
     mutationFn: removeFromCart,
@@ -76,7 +81,7 @@ function CartItem({ product }: { product: any }) {
       queryClient.invalidateQueries(detailedCartOptions);
       queryClient.invalidateQueries(getCartOptions);
     },
-  })
+  });
   if (!product) {
     return null;
   }
@@ -100,10 +105,10 @@ function CartItem({ product }: { product: any }) {
       >
         <div className="flex flex-row space-x-2">
           <div className="flex h-24 w-24 items-center justify-center bg-gray-100">
-            <img
+            <Image
               loading="eager"
               decoding="sync"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi-xMoDjjaArHWcEuGxU3YW_VNCU00gd_2-Q&s"
+              src={product.image_url ?? 'placeholder.jpg'}
               alt="Product"
               width={256}
               height={256}

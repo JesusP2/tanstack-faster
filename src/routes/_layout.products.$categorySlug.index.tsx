@@ -6,6 +6,7 @@ import {
   categoryProductCountOptions,
   getCategory,
 } from '@/lib/functions';
+import { Image } from '@/components/image';
 
 export const Route = createFileRoute('/_layout/products/$categorySlug/')({
   component: RouteComponent,
@@ -57,13 +58,13 @@ function RouteComponent() {
                     to="/products/$categorySlug/$subcategorySlug"
                   >
                     <div className="py-2">
-                      <img
+                      <Image
                         alt={`A small picture of ${subcategory.name}`}
                         className="h-12 w-12 flex-shrink-0 object-cover"
                         decoding="sync"
                         height={48}
                         loading="eager"
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi-xMoDjjaArHWcEuGxU3YW_VNCU00gd_2-Q&s"
+                        src={subcategory.image_url ?? 'placeholder.jpg'}
                         width={48}
                       />
                     </div>

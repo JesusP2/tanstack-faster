@@ -1,11 +1,12 @@
-import { Link } from '@tanstack/react-router';
-import type { Product } from '@/db/schema';
+import { Link } from "@tanstack/react-router";
+import type { Product } from "@/db/schema";
+import { Image } from "@/components/image";
 
 export function ProductLink(props: {
   imageUrl?: string | null;
   category_slug: string;
   subcategory_slug: string;
-  loading: 'eager' | 'lazy';
+  loading: "eager" | "lazy";
   product: Product;
 }) {
   const { category_slug, subcategory_slug, product, imageUrl } = props;
@@ -21,13 +22,13 @@ export function ProductLink(props: {
       to="/products/$categorySlug/$subcategorySlug/$productSlug"
     >
       <div className="py-2">
-        <img
+        <Image
           alt={`A small picture of ${product.name}`}
           className="h-auto w-12 flex-shrink-0 object-cover"
           decoding="sync"
           height={48}
           loading={props.loading}
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi-xMoDjjaArHWcEuGxU3YW_VNCU00gd_2-Q&s"
+          src={imageUrl ?? 'placeholder.jpg'}
           width={48}
         />
       </div>

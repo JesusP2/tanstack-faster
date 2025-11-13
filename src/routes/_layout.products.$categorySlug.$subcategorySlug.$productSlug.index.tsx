@@ -6,6 +6,7 @@ import {
   productDetailsOptions,
   productsForSubcategoryOptions,
 } from '@/lib/functions';
+import { Image } from '@/components/image';
 
 export const Route = createFileRoute(
   '/_layout/products/$categorySlug/$subcategorySlug/$productSlug/'
@@ -37,13 +38,13 @@ function RouteComponent() {
       </h1>
       <div className="flex flex-col gap-2">
         <div className="flex flex-row gap-2">
-          <img
+          <Image
             alt={`A small picture of ${productData.name}`}
             className="h-56 w-56 flex-shrink-0 border-2 md:h-64 md:w-64"
             decoding="sync"
             height={256}
             loading="eager"
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi-xMoDjjaArHWcEuGxU3YW_VNCU00gd_2-Q&s"
+            src={productData.image_url ?? 'placeholder.jpg'}
             width={256}
           />
           <p className="flex-grow text-base">{productData.description}</p>
