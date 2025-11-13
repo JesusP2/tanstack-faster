@@ -133,7 +133,7 @@ function RootDocument() {
                 <div className="text-center sm:text-right">
                   By using this website, you agree to check out the{" "}
                   <a
-                    href="https://github.com/ethanniser/NextFaster"
+                    href="https://github.com/jesusp2/tanstack-faster"
                     className="font-bold text-accent1 hover:underline"
                     target="_blank"
                   >
