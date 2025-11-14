@@ -7,11 +7,22 @@ import {
   getCategory,
 } from '@/lib/functions';
 import { Image } from '@/components/image';
+import { prefetchImages } from '@/lib/prefetch-images';
 
 export const Route = createFileRoute('/_layout/products/$categorySlug/')({
   component: RouteComponent,
-  beforeLoad: async ({ context, params }) => {
+  beforeLoad: async ({ context, params, ...args }) => {
     const { categorySlug } = params;
+    if (args.preload) {
+      const { images } = await prefetchImages({
+        data: {
+          pathname: args.location.href
+        }
+      })
+      images.forEach(image => prefetchImage(image))
+      console.log('images', images)
+    }
+    console.log('loading /products/$categorySlug', args, params)
     Promise.all([
       context.queryClient.ensureQueryData(categoryOptions(categorySlug)),
       context.queryClient.ensureQueryData(

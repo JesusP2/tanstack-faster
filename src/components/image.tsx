@@ -398,7 +398,6 @@ export const Image = ({
     };
   }
 
-  // Handle preload
   React.useEffect(() => {
     if (preload && imageUrl) {
       const link = document.createElement("link");

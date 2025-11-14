@@ -23,6 +23,7 @@ export function ProductLink(props: {
     >
       <div className="py-2">
         <Image
+          preload
           alt={`A small picture of ${product.name}`}
           className="h-auto w-12 flex-shrink-0 object-cover"
           decoding="sync"
