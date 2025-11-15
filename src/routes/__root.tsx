@@ -36,6 +36,54 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       {
         title: "Tanstack Faster",
       },
+      {
+        name: "description",
+        content: "",
+      },
+      {
+        property: "og:url",
+        content: "https://tanstack-faster.jesusp2.com/",
+      },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        property: "og:title",
+        content: "Tanstack Faster",
+      },
+      {
+        property: "og:description",
+        content: "",
+      },
+      {
+        property: "og:image",
+        content: "https://tanstack-faster.jesusp2.com/opengraph.png",
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        property: "twitter:domain",
+        content: "tanstack-faster.jesusp2.com",
+      },
+      {
+        property: "twitter:url",
+        content: "https://tanstack-faster.jesusp2.com/",
+      },
+      {
+        name: "twitter:title",
+        content: "Tanstack Faster",
+      },
+      {
+        name: "twitter:description",
+        content: "",
+      },
+      {
+        name: "twitter:image",
+        content: "https://tanstack-faster.jesusp2.com/opengraph.png",
+      },
     ],
     links: [
       {
