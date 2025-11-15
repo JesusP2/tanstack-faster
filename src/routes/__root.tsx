@@ -2,10 +2,10 @@ import type { QueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
   HeadContent,
-  Link,
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { Link } from "@/components/link";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AuthProvider } from "@/auth/provider";
 import { useUserQueryOptions } from "@/auth/use-user";

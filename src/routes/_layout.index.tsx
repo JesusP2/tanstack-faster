@@ -1,15 +1,27 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@/components/link";
 import { collectionsOptions, productCountOptions } from "@/lib/functions";
 import { Image } from "@/components/image";
+import { prefetchImagesOptions } from "@/lib/prefetch-images";
 
 export const Route = createFileRoute("/_layout/")({
   component: HomeComponent,
-  beforeLoad: async ({ context }) => {
-    Promise.all([
-      context.queryClient.ensureQueryData(collectionsOptions),
-      context.queryClient.ensureQueryData(productCountOptions),
-    ]);
+  beforeLoad: async ({ context, preload, location }) => {
+    if (preload) {
+      Promise.all([
+        context.queryClient.ensureQueryData(collectionsOptions),
+        context.queryClient.ensureQueryData(productCountOptions),
+        context.queryClient.ensureQueryData(
+          prefetchImagesOptions(location.href),
+        ),
+      ]);
+    } else {
+      Promise.all([
+        context.queryClient.ensureQueryData(collectionsOptions),
+        context.queryClient.ensureQueryData(productCountOptions),
+      ]);
+    }
   },
 });
 
@@ -39,7 +51,7 @@ function HomeComponent() {
                   decoding="sync"
                   height={48}
                   loading={imageCount++ < 15 ? "eager" : "lazy"}
-                  src={category.image_url ?? 'placeholder.jpg'}
+                  src={category.image_url ?? "placeholder.jpg"}
                   width={48}
                 />
                 <span className="text-xs">{category.name}</span>

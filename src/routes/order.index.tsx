@@ -4,7 +4,8 @@ import {
   removeFromCart,
 } from "@/lib/cart";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import { Link } from "@/components/link";
 import { X } from "lucide-react";
 import { Suspense } from "react";
 import { Image } from "@/components/image";

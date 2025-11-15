@@ -1,3 +1,5 @@
+import { env } from "@/shared/env";
+import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { parseHTML } from "linkedom";
@@ -10,9 +12,12 @@ export const prefetchImages = createServerFn()
     }),
   )
   .handler(async ({ data }) => {
-    const url = new URL(data.pathname, import.meta.env.VITE_SERVER_URL);
+    const url = new URL(data.pathname, env.VITE_SERVER_URL);
     const response = await fetch(url);
     if (!response.ok) {
+      console.error("url:", url.toString());
+      const error = await response.text();
+      console.error("error:", error);
       throw new Error("Failed to fetch");
     }
     const body = await response.text();
@@ -32,26 +37,11 @@ export const prefetchImages = createServerFn()
     };
   });
 
-const seen = new Set<string>();
-type PrefetchImage = {
-  srcset: string;
-  sizes: string;
-  src: string;
-  alt: string;
-  loading: string;
-};
-export function prefetchImage(image: PrefetchImage) {
-  if (image.loading === "lazy" || seen.has(image.srcset)) {
-    return;
-  }
-  const img = new Image();
-  img.decoding = "async";
-  img.fetchPriority = "low";
-  if (image.sizes) {
-    img.sizes = image.sizes;
-  }
-  seen.add(image.srcset);
-  img.srcset = image.srcset;
-  img.src = image.src;
-  img.alt = image.alt;
-}
+export const prefetchImagesOptions = (href: string) => queryOptions({
+  queryKey: ["prefetch-images", href],
+  queryFn: async () => {
+    const { images } = await prefetchImages({ data: { pathname: href } });
+    return images;
+  },
+});
+

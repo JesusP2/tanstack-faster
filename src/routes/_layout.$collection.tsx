@@ -1,20 +1,36 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { collectionDetailsOptions } from '@/lib/functions';
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@/components/link";
+import { collectionDetailsOptions } from "@/lib/functions";
 import { Image } from "@/components/image";
+import {
+  prefetchImagesOptions,
+} from "@/lib/prefetch-images";
 
-export const Route = createFileRoute('/_layout/$collection')({
+export const Route = createFileRoute("/_layout/$collection")({
   component: RouteComponent,
-  beforeLoad: async ({ context, params }) =>
-    context.queryClient.ensureQueryData(
-      collectionDetailsOptions(params.collection)
-    ),
+  beforeLoad: async ({ context, params, preload, location }) => {
+    if (preload) {
+      Promise.all([
+        context.queryClient.ensureQueryData(
+          collectionDetailsOptions(params.collection),
+        ),
+        context.queryClient.ensureQueryData(
+          prefetchImagesOptions(location.href),
+        ),
+      ]);
+    } else {
+      context.queryClient.ensureQueryData(
+        collectionDetailsOptions(params.collection),
+      );
+    }
+  },
 });
 
 function RouteComponent() {
   const { collection } = Route.useParams();
   const { data: collections } = useSuspenseQuery(
-    collectionDetailsOptions(collection)
+    collectionDetailsOptions(collection),
   );
   let imageCount = 0;
   return (
@@ -34,9 +50,9 @@ function RouteComponent() {
                   alt={`A small picture of ${category.name}`}
                   className="mb-2 h-14 w-14 border hover:bg-accent2"
                   decoding="sync"
-                  src={category.image_url ?? 'placeholder.jpg'}
+                  src={category.image_url ?? "placeholder.jpg"}
                   height={48}
-                  loading={imageCount++ < 15 ? 'eager' : 'lazy'}
+                  loading={imageCount++ < 15 ? "eager" : "lazy"}
                   width={48}
                 />
                 <span className="text-xs">{category.name}</span>

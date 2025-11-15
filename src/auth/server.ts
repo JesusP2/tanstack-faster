@@ -12,7 +12,9 @@ export const auth = betterAuth({
     schema,
   }),
   rateLimit: {
-    window: 10,
+    enabled: false,
+    // window: 1,
+    // max: 10000,
   },
   plugins: [
     anonymous(),

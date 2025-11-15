@@ -1,34 +1,37 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useServerFn } from '@tanstack/react-start';
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@/components/link";
+import { useServerFn } from "@tanstack/react-start";
 import {
   categoryOptions,
   categoryProductCountOptions,
   getCategory,
-} from '@/lib/functions';
-import { Image } from '@/components/image';
-import { prefetchImages } from '@/lib/prefetch-images';
+} from "@/lib/functions";
+import { Image } from "@/components/image";
+import { prefetchImagesOptions } from "@/lib/prefetch-images";
 
-export const Route = createFileRoute('/_layout/products/$categorySlug/')({
+export const Route = createFileRoute("/_layout/products/$categorySlug/")({
   component: RouteComponent,
-  beforeLoad: async ({ context, params, ...args }) => {
+  beforeLoad: async ({ context, params, preload, location }) => {
     const { categorySlug } = params;
-    if (args.preload) {
-      const { images } = await prefetchImages({
-        data: {
-          pathname: args.location.href
-        }
-      })
-      images.forEach(image => prefetchImage(image))
-      console.log('images', images)
+    if (preload) {
+      Promise.all([
+        context.queryClient.ensureQueryData(categoryOptions(categorySlug)),
+        context.queryClient.ensureQueryData(
+          categoryProductCountOptions(categorySlug),
+        ),
+        context.queryClient.ensureQueryData(
+          prefetchImagesOptions(location.href),
+        ),
+      ]);
+    } else {
+      Promise.all([
+        context.queryClient.ensureQueryData(categoryOptions(categorySlug)),
+        context.queryClient.ensureQueryData(
+          categoryProductCountOptions(categorySlug),
+        ),
+      ]);
     }
-    console.log('loading /products/$categorySlug', args, params)
-    Promise.all([
-      context.queryClient.ensureQueryData(categoryOptions(categorySlug)),
-      context.queryClient.ensureQueryData(
-        categoryProductCountOptions(categorySlug)
-      ),
-    ]);
   },
 });
 
@@ -36,18 +39,18 @@ function RouteComponent() {
   const { categorySlug } = Route.useParams();
   const serverFn = useServerFn(getCategory);
   const { data: category } = useSuspenseQuery({
-    queryKey: ['category', categorySlug],
+    queryKey: ["category", categorySlug],
     queryFn: () => serverFn({ data: { categorySlug } }),
   });
   const { data: countRes } = useSuspenseQuery(
-    categoryProductCountOptions(categorySlug)
+    categoryProductCountOptions(categorySlug),
   );
   const finalCount = countRes[0]?.count;
   return (
     <div className="container p-4">
       {finalCount && (
         <h1 className="mb-2 border-b-2 font-bold text-sm">
-          {finalCount} {finalCount === 1 ? 'Product' : 'Products'}
+          {finalCount} {finalCount === 1 ? "Product" : "Products"}
         </h1>
       )}
       <div className="space-y-4">
@@ -75,7 +78,7 @@ function RouteComponent() {
                         decoding="sync"
                         height={48}
                         loading="eager"
-                        src={subcategory.image_url ?? 'placeholder.jpg'}
+                        src={subcategory.image_url ?? "placeholder.jpg"}
                         width={48}
                       />
                     </div>
@@ -85,7 +88,7 @@ function RouteComponent() {
                       </div>
                     </div>
                   </Link>
-                )
+                ),
               )}
             </div>
           </div>

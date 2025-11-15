@@ -1,11 +1,23 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { collectionsOptions } from '@/lib/functions';
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { Link } from "@/components/link";
+import { collectionsOptions } from "@/lib/functions";
+import { prefetchImagesOptions } from "@/lib/prefetch-images";
 
-export const Route = createFileRoute('/_layout')({
+export const Route = createFileRoute("/_layout")({
   component: RouteComponent,
-  beforeLoad: ({ context }) =>
-    context.queryClient.ensureQueryData(collectionsOptions),
+  beforeLoad: ({ context, preload }) => {
+    if (preload) {
+      Promise.all([
+        context.queryClient.ensureQueryData(collectionsOptions),
+        context.queryClient.ensureQueryData(
+          prefetchImagesOptions(location.href),
+        ),
+      ]);
+    } else {
+      context.queryClient.ensureQueryData(collectionsOptions);
+    }
+  },
 });
 
 function RouteComponent() {

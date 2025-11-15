@@ -1,5 +1,6 @@
 import { AuthView } from '@daveyplate/better-auth-ui';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
+import { Link } from "@/components/link";
 import { ArrowLeft } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 

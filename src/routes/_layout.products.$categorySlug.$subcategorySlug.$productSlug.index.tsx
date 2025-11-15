@@ -7,20 +7,36 @@ import {
   productsForSubcategoryOptions,
 } from '@/lib/functions';
 import { Image } from '@/components/image';
+import { prefetchImagesOptions } from '@/lib/prefetch-images';
 
 export const Route = createFileRoute(
   '/_layout/products/$categorySlug/$subcategorySlug/$productSlug/'
 )({
   component: RouteComponent,
-  beforeLoad: async ({ context, params }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(
-        productDetailsOptions(params.productSlug)
-      ),
-      context.queryClient.ensureQueryData(
-        productsForSubcategoryOptions(params.subcategorySlug)
-      ),
-    ]),
+  beforeLoad: async ({ context, params, preload, location }) => {
+    if (preload) {
+      Promise.all([
+        context.queryClient.ensureQueryData(
+          productDetailsOptions(params.productSlug),
+        ),
+        context.queryClient.ensureQueryData(
+          productsForSubcategoryOptions(params.subcategorySlug),
+        ),
+        context.queryClient.ensureQueryData(
+          prefetchImagesOptions(location.href),
+        ),
+      ]);
+    } else {
+      Promise.all([
+        context.queryClient.ensureQueryData(
+          productDetailsOptions(params.productSlug),
+        ),
+        context.queryClient.ensureQueryData(
+          productsForSubcategoryOptions(params.subcategorySlug),
+        ),
+      ]);
+    }
+  }
 });
 
 function RouteComponent() {

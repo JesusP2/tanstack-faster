@@ -43,6 +43,7 @@ export const getProductsForSubcategory = createServerFn()
           where: (products, { eq, and }) =>
             and(eq(products.subcategory_slug, data.subcategorySlug)),
           orderBy: (products, { asc }) => asc(products.slug),
+          limit: 20,
         }),
       "getProductsForSubcategory",
       data,
@@ -163,7 +164,8 @@ export const getCollectionDetails = createServerFn()
           with: {
             categories: true,
           },
-          where: (collections, { eq }) => eq(collections.slug, data.collectionSlug),
+          where: (collections, { eq }) =>
+            eq(collections.slug, data.collectionSlug),
           orderBy: (collections, { asc }) => asc(collections.slug),
         }),
       "getCollectionDetails",

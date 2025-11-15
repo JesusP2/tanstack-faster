@@ -8,9 +8,9 @@ export const useUserQueryOptions = queryOptions({
   queryFn: async () => {
     const session = await authClient.getSession();
     if (!session.data?.session) {
-      const { data: anonymousData } = await authClient.signIn.anonymous();
+      const { data: anonymousData, error } = await authClient.signIn.anonymous();
       if (!anonymousData?.user) {
-        throw new Error('Failed to get user');
+        throw new Error(`Failed to get user : ${error?.message}`);
       }
       return {
         ...anonymousData?.user,
